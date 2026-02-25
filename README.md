@@ -32,30 +32,43 @@ uv sync
 Create a `.env` file in the project root with the following variables:
 
 ```env
+# ====================
+# APPLICATION
+# ====================
+# Optional: Application port (default: 5000)
+APP_PORT=5000
+
+# ====================
+# MEM0 CONFIGURATION
+# ====================
 # Required: Choose provider - "cloud_platform" or "self_hosted"
 MEM0_PROVIDER=self_hosted
 
 # Required for Cloud Platform: Your Mem0 API key
-MEM0_API_KEY=your_api_key_here
+MEM0_API_KEY=your-mem0-api-key-here
 
 # Required for Self-Hosted: OpenAI API key (for embeddings and LLM)
-OPENAI_API_KEY=your_openai_key_here
+# Get your key from: https://platform.openai.com/api-keys
+OPENAI_API_KEY=your-openai-api-key-here
 
+# ====================
+# SEARCH DRIVER
+# ====================
 # Required for Self-Hosted only: Choose search driver - "mem0" or "pgvector"
 # Note: This setting has no effect when MEM0_PROVIDER=cloud_platform
 # - mem0: Uses Mem0 client API for search (default)
 # - pgvector: Direct SQL queries to PGVector database
 MEMORY_SEARCH_DRIVER=mem0
 
-# PGVector Database Configuration (for self-hosted)
+# ====================
+# PGVECTOR DATABASE
+# ====================
+# PGVector Database Configuration (for self-hosted with pgvector driver)
 PGVECTOR_HOST=localhost
 PGVECTOR_PORT=5432
 PGVECTOR_USER=postgres
 PGVECTOR_PASSWORD=mysecretpassword
 PGVECTOR_DBNAME=mem0_db
-
-# Optional: Application port (default: 5000)
-APP_PORT=5000
 ```
 
 ## Search Drivers
