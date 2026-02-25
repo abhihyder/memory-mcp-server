@@ -42,12 +42,7 @@ class SelfHosted(Mem0Base):
     
     def _search_with_mem0(self, query: str, filters: SearchFilter) -> dict[str, Any]:
         """Search using the mem0 client."""
-        if filters is not None:
-            filter_dict = {}
-            if filters.get("user_id"):
-                filter_dict["user_id"] = filters["user_id"]
-            return self.client.search(query, filters=filter_dict) if filter_dict else self.client.search(query)
-        return self.client.search(query)
+        return self.client.search(query, **filters)
     
     def _search_with_pgvector(self, query: str, filters: SearchFilter) -> dict[str, Any]:
         """
@@ -128,17 +123,9 @@ class SelfHosted(Mem0Base):
         
         # Dynamically add all filter keys to WHERE clause
         if filters is not None:
-            # If both app_id and agent_id exist, prefer agent_id (skip app_id)
-            has_agent_id = filters.get("agent_id") is not None
-            
             for key, value in filters.items():
                 if value is not None:
-                    # Skip app_id if agent_id is already present
-                    if key == "app_id" and has_agent_id:
-                        continue
-                    # Map app_id to agent_id (payload uses agent_id)
-                    payload_key = "agent_id" if key == "app_id" else key
-                    where_clauses.append(f"payload->>'{payload_key}' = %s")
+                    where_clauses.append(f"payload->>'{key}' = %s")
                     params.append(value)
         
         # Always include similarity threshold filter
@@ -153,12 +140,6 @@ class SelfHosted(Mem0Base):
             SELECT 
                 id,
                 payload->>'data' AS memory,
-                payload->>'user_id' AS user_id,
-                payload->>'agent_id' AS agent_id,
-                payload->>'run_id' AS run_id,
-                payload->>'hash' AS hash,
-                payload->>'created_at' AS created_at,
-                payload->>'updated_at' AS updated_at,
                 1 - (vector <=> %s::vector) AS similarity
             FROM {collection_name}
             {where_sql}
