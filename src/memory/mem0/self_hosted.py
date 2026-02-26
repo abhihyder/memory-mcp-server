@@ -57,13 +57,11 @@ class SelfHosted(Mem0Base):
             results = self._execute_pgvector_search(query_embedding, filters)
             
             return {
-                "status": "success",
                 "results": results
             }
         except Exception as e:
             logger.error(f"Error during pgvector search: {e}")
             return {
-                "status": "error",
                 "results": []
             }
     
